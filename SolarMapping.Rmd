@@ -5,26 +5,102 @@ date: "5/20/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup}
+knitr::opts_knit$set(echo = TRUE, root.dir = "/Documents/02 - Personal Projects/01 - Solar Mapping Project")
 ```
 
-## R Markdown
+# Solar Mapping Project
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+This project makes use of Python to transform 959 files that include meteorological data. It then uses R to combine all of those into a dataframe and manipulate it from there. The main objective is to interpolate the solar irradiance data and plot it on a map of the U.S. to identify key areas for solar energy production. Because the file integrity is maintained, it is ensured that further analysis can be done on the meteorological data.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r}
+# install.packages("reticulate")
+library(reticulate)
+use_condaenv()
 ```
 
-## Including Plots
+## Transform the Data
+### Import List of Files
+```{python}
+# import all needed packages
+import csv
+import os
 
-You can also embed plots, for example:
+# change the directory to where all the .csv files are
+os.chdir("D:\\Documents\\02 - Personal Projects\\01 - Solar Mapping Project\\Data\\TMY3")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+# use the os module to get a list of all .csv files in the directory
+dirs = os.listdir('.')
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Transform
+```{python}
+# change the directory to where all the .csv files are
+os.chdir("D:\\Documents\\02 - Personal Projects\\01 - Solar Mapping Project\\Data\\TMY3")
+
+# take lat, lon, and elevation and append as a column, then strip rows 1:3 and save the changes
+for file in dirs:
+    if (file.endswith('.csv')):
+        print (file)
+        lineCnt = 0
+        newCsvLines = []
+        with open(file, 'rt') as csvfile:
+            line = csv.reader(csvfile, delimiter=',', quotechar='"')
+            for row in line:
+                lineCnt = lineCnt + 1
+                if lineCnt == 2:
+                    lat = row[5]
+                    long = row[6]
+                    el = row[8].strip()
+                if lineCnt >= 4:
+                    row.append(lat)
+                    row.append(long)
+                    row.append(el)
+                    newCsvLines.append(row)
+        with open('%s' % file, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            for l in newCsvLines:
+                writer.writerow(l)
+```
+
+Set Up R
+```{r}
+# set working directory
+setwd("/Documents/02 - Personal Projects/01 - Solar Mapping Project")
+
+# specify the packages of interest
+packages = c("ggplot2",
+             "ggcharts",
+             "dplyr",
+             "readxl")
+
+# use this function to check if each package is on the local machine
+# if a package is installed, it will be loaded
+# if any are not, the missing package(s) will be installed and loaded
+package.check <- lapply(packages, FUN = function(x) {
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x, dependencies = TRUE)
+    library(x, character.only = TRUE)
+  }
+})
+```
+
+
+
+```{r}
+# set the input path
+inDir <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3"
+
+# get a list of all the files
+file_list <- list.files(path=inDir, pattern="*.csv")
+
+# take a look
+head(file_list)
+```
+
+
+```{r}
+# combine all files in the listed directory into one dataframe
+# df = dplyr::bind_rows(file_list, )
+```
+

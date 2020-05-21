@@ -6,7 +6,9 @@ setwd("/Documents/02 - Personal Projects/01 - Solar Mapping Project")
 packages = c("ggplot2",
              "ggcharts",
              "dplyr",
-             "readxl")
+             "readxl",
+             "data.table",
+             "purrr")
 
 # use this function to check if each package is on the local machine
 # if a package is installed, it will be loaded
@@ -34,26 +36,21 @@ package.check <- lapply(packages, FUN = function(x) {
 # # combine all columns and force lat, lon, and elevation to repeat for every column
 # dfTestConcat <- cbind(dfTest, lat, lon, elevation)
 
-# define new row names and store in a vector
-cNames <- c("Year", "Month", "Day", "Hour", "Minute", "DHI", "DNI", "GHI", "DewPoint",
-            "Temperature", "Pressure", "RelativeHumidity", "WindSpeed", "Latitude",
-            "Longitude", "Elevation")
+# # set the input path
+# inDir <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3"
 
-# set the input path
-inDir <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3"
+# # get a list of all the files
+# file_list <- list.files(path=inDir, pattern="*.csv")
 
-# get a list of all the files
-file_list <- list.files(path=inDir, pattern="*.csv")
-
-# change directory to file locations
-setwd("/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3")
+# # change directory to file locations
+# setwd("/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3")
 
 # get each file and perform read table on each and pass them to the global environment
-list2env(
-  lapply(setNames(file_list,
-    make.names(file_list)),
-  read.table, header = FALSE, sep = ",", fill = TRUE),
-  envir = .GlobalEnv)
+# list2env(
+#   lapply(setNames(file_list,
+#     make.names(file_list)),
+#   read.table, header = FALSE, sep = ",", fill = TRUE),
+#   envir = .GlobalEnv)
     
 #####
 ##### create a custom function to do the following: 
@@ -61,35 +58,59 @@ list2env(
 # pull out lat, lon, and elevation from the first two rows
 # remove first 4 rows to get to the meat of the data
 # combine all columns and force lat, lon, and elevation to repeat for every column
-etlTMY3 <- function(file){
-  raw <- read.table(file, header = FALSE, sep = ",", fill = TRUE)
-  lat <- raw[2,6]
-  lon <- raw[2,7]
-  elevation <- raw[2,9]
-  raw <- slice(raw, 4:n())
-  raw <- cbind(raw, lat, lon, elevation)
-}
+# etlTMY3 <- function(file){
+#   raw <- read.table(file, header = FALSE, sep = ",", fill = TRUE)
+#   lat <- raw[2,6]
+#   lon <- raw[2,7]
+#   elevation <- raw[2,9]
+#   raw <- slice(raw, 4:n())
+#   raw <- cbind(raw, lat, lon, elevation)
+# }
+
+# # set the output path
+# outDir <- "Data/TMY3_out"
+# 
+# # change wd to ouput path
+# setwd(outDir)
+# 
+# # export the edited file to a new .csv file and directory
+# mapply(write.csv, file_list, file = paste0(names(file_list)), ".csv")
 
 
 
+# set the input path
+inDir <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3"
 
-# set the output path
-outDir <- "Data/TMY3_out"
+# combine all files in the listed directory into one dataframe
+df = list.files(path=inDir, pattern="*.csv") %>% 
+  map_df(~fread(.))
 
-# change wd to ouput path
-setwd(outDir)
+# take a look 
+head(df)
 
-# export the edited file to a new .csv file and directory
-mapply(write.csv, file_list, file = paste0(names(file_list)), ".csv")
+# rename col names
+df = df %>% 
+  rename(Year = V1, 
+         Month = V2, 
+         Day = V3, 
+         Hour = V4, 
+         Minute = V5, 
+         DHI = V6, 
+         DNI = V7, 
+         GHI = V8, 
+         DewPoint = V9,
+         Temperature = V10, 
+         Pressure = V11, 
+         RelativeHumidity = V12, 
+         WindSpeed = V13, 
+         Latitude = V14,
+         Longitude = V15, 
+         Elevation = V16)
 
+dfFinal <- as_tibble(df)
 
-
-
-
-
-
-
-
+# take a look
+head(dfFinal)
 
 
 
