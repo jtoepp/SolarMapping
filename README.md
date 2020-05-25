@@ -38,5 +38,6 @@ I realized that I had now learned in R everything I needed to fill the gaps. In 
   - Animate through the 12 months with gganimate()
   - Share final conclusions
  
-### Similar Image
+### Similar Image...
+From my past work in Climate Science utilizing MATLAB, [found here](https://github.com/jtoepp/computational-methods)
 ![test](https://github.com/jtoepp/computational-methods/blob/master/Project%201/Figures/Figure%203.jpg)**Figure 1:** Calculated global Theta-e
