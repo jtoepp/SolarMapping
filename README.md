@@ -1,10 +1,10 @@
 # Solar Mapping Project
 *this project is in progress*
 ### Three years ago...
-I started this project in MATLAB and worked with a team to get visualization of prime solar locations across the entire U.S. using a heat map. However, I could not make the final breakthrough--my skills in MATLAB at the time were more limited and the interpolation failed time and again to produce decent results. The final visualization was resorted to Tableau, with dot size/color and county colors representing the annual total solar influx.
+...I started this project in MATLAB and worked with a team to get visualization of prime solar locations across the entire U.S. using a heat map. However, I could not make the final breakthrough--my skills in MATLAB at the time were more limited and the interpolation failed time and again to produce decent results. The final visualization was resorted to Tableau, with dot size/color and county colors representing the annual total solar influx.
 
 ### Recently...
-I realized that I had now learned in R everything I needed to fill the gaps. In addition, I have also gained skill through GIS of different types of interpolation meant for spatial methods. With these skills combined, I can finally go back and create the entire project from scratch. As a Climate Data Scientist, I can see it in my head... I want to share that image with the entire community.
+...I realized that I had now learned in R everything I needed to fill the gaps. In addition, I have also gained skill through GIS of different types of interpolation meant for spatial methods. With these skills combined, I can finally go back and create the entire project from scratch. As a Climate Data Scientist, I can see it in my head... I want to share that image with the entire community.
 
 ##### Work So Far
 - Utilized Python to wrangle all 959 files--strip the double header and repeat several individual values as column vectors
@@ -39,5 +39,5 @@ I realized that I had now learned in R everything I needed to fill the gaps. In 
   - Share final conclusions
  
 ### Similar Image...
-From my past work in Climate Science utilizing MATLAB, [found here](https://github.com/jtoepp/computational-methods).
+...from my past work in Climate Science utilizing MATLAB, [found here](https://github.com/jtoepp/computational-methods).
 ![test](https://github.com/jtoepp/computational-methods/blob/master/Project%201/Figures/Figure%203.jpg)**Figure 1:** Calculated global Theta-e
