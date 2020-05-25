@@ -1,6 +1,12 @@
 # data retrieved from https://rredc.nrel.gov/solar/old_data/nsrdb/1991-2005/tmy3/
+# define project home directory
+home <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project"
+
 # set working directory for the current project
-setwd("/Documents/02 - Personal Projects/01 - Solar Mapping Project")
+setwd(home)
+
+# verify 
+getwd()
 
 # specify the packages of interest
 packages = c("ggplot2",
@@ -8,7 +14,11 @@ packages = c("ggplot2",
              "dplyr",
              "readxl",
              "data.table",
-             "purrr")
+             "purrr",
+             "tidyr",
+             "lubridate",
+             "chron",
+             "DataExplorer")
 
 # use this function to check if each package is on the local machine
 # if a package is installed, it will be loaded
@@ -81,6 +91,9 @@ package.check <- lapply(packages, FUN = function(x) {
 # set the input path
 inDir <- "/Documents/02 - Personal Projects/01 - Solar Mapping Project/Data/TMY3"
 
+# change the working directory 
+setwd(inDir)
+
 # combine all files in the listed directory into one dataframe
 df = list.files(path=inDir, pattern="*.csv") %>% 
   map_df(~fread(.))
@@ -107,10 +120,149 @@ df = df %>%
          Longitude = V15, 
          Elevation = V16)
 
+# store as a tibble in a new dataframe
 dfFinal <- as_tibble(df)
 
 # take a look
 head(dfFinal)
+
+# add a new date column combining Month and Day columns and store in new dataframe
+dfSolar <- unite(dfFinal, Date, c(Month, Day), remove = FALSE)
+
+# take a look
+head(dfSolar)
+
+# convert Date column to Date format
+dfSolar$Date <- as.Date(dfSolar$Date, format="%m_%d")
+
+# verify correct Date class for Date column
+str(dfSolar$Date)
+
+# take another look
+head(dfSolar)
+
+# drop old Month and Day columns
+dfSolar <- dfSolar %>% 
+  select(-Month, -Day)
+
+# take a final look
+head(dfSolar) 
+
+# Because of the year being a Typical Meteorological Year, it does not have a date
+# However... as.date() automatically fills in the current year if none is provided
+# It is good to keep in mind that this is not a valid year and should not be used in plots/reports
+
+# return to home directory
+setwd(home)
+
+# verify directory
+getwd()
+
+### Get a better idea of each variable
+# summarize each column with introduce(), and transform from 1x9 tibble to 8x2 for easier viewing
+introduce(dfSolar) %>% 
+  gather(var, val, 2:ncol(dfSolar)) %>% 
+  spread_(names(dfSolar)[1], "val")
+
+# utilize plot_intro to visualize
+plot_intro(dfSolar) # confirmed no N/A observations to deal with
+
+# # not needed due to no missins observations
+# # visualize columns with N/A observations
+# plot_missing(dfSolar)
+
+# set a save path for later use of ggsave()
+plotPath = "./Plots"
+
+# visualize distribution
+dfSolar %>% 
+  bar_chart(x = Year) +
+  labs(x = "Year",
+       y = "Frequency",
+       title = "Frequency of Each String Occurrence") +
+  theme_nightblue(grid = "XY",
+                  axis = "x",
+                  ticks = "x") 
+  # ggsave("StringFrequency.png",
+  #        plot = last_plot(),
+  #        path = plotPath)
+
+# with the only value in Year being Typical, drop the column
+dfSolar <- dfSolar %>% 
+  select(-Year)
+
+# take a look with glimpse() to see all 14 columns vertically
+glimpse(dfSolar)
+
+
+# take a look at the original df to pull the Month column out for later aggregation
+head(dfFinal)
+
+# take a more useful look
+glimpse(dfFinal)
+
+# convert dataframe to long format for plotting with facet_wrap()
+# and remove Hour and Minute so the focus is on the date
+dfSolar_long <- dfFinal %>%
+  select(-Year, -Day, -Hour, -Minute, -Latitude, -Longitude) %>%
+  gather(Variable, Value, -Month)
+
+# take a look
+head(dfSolar_long)
+
+########## LEFT OFF HERE ##########
+# aggregate based on Date
+dfSolar_aggregate <- aggregate(dfSolar_long,
+                               by = list(dfSolar_long$Month),
+                               FUN = sum)
+
+# take a look
+head(dfSolar_aggregate)
+
+# histogram of all columns with facet_wrap()
+ggplot(dfSolar, 
+       aes(x = Date,
+           y = Value,
+           linetype = Variable,
+           color = Variable)) +
+  geom_smooth(method = "loess", linetype = 1, color = "lightgray") +
+  geom_line(linetype = 1) +
+  facet_wrap(~Variable, scales="free_y", nrow=2, strip.position="top") +
+  theme_dark() +
+  labs(name = "Variable",
+       title = "Air Quality Dataset (1973)",
+       subtitle = "Individual plots of each variable utilizing 'loess'
+  - t-based approximation for a smoothing curve and confidence interval",
+       caption = "Units:
+       Ozone (parts per billion)
+       Solar (Watts per square meter)
+       Wind (Miles per Hour)
+       Temp (degrees Fahrenheit)",
+       ylab = "Values*") 
+  # ggsave("Fig12.png",
+  #        plot = last_plot(),
+  #        path = pathGraphs)
+
+
+
+
+
+##### Testing Chron function to convert to a time data type #####
+# convert Date column to Date format
+dfSolar$Date <- chron(dfSolar$Date, format = c( 'm-d' , 'h:m' ))
+
+# verify correct Date class for Date column
+str(dfSolar$Date)
+
+
+
+
+
+
+
+
+
+
 
 
 
