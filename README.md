@@ -34,8 +34,8 @@ I realized that I had now learned in R everything I needed to fill the gaps. In 
 - Final plans
   - Interpolate all 959 geolocated DNI values most likely using Kriging interpolation 
       - Could also look into effectiveness of KNN (k-Nearest Neighbor) interpolation, Spline interpolation
-  - Utilize a heat map plotted on the US map (similar to here)["https://www.prnewswire.com/news-releases/doximity-helps-physicians-navigate-their-careers-with-first-ever-local-compensation-map-300026248.html"]
+  - Utilize a heat map plotted on the US map [similar to here](https://www.prnewswire.com/news-releases/doximity-helps-physicians-navigate-their-careers-with-first-ever-local-compensation-map-300026248.html)
   - Animate through the 12 months with gganimate()
   - Share final conclusions
   
-  (test)[link]
+![test](https://github.com/jtoepp/computational-methods/blob/master/Project%201/Figures/Figure%203.jpg)**Figure 1:** Calculated global Theta-e
