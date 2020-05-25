@@ -1,1 +1,2 @@
-Solar Mapping Project
+# Solar Mapping Project
+*this project is in progress*
